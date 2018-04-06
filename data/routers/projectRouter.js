@@ -40,14 +40,20 @@ router.get('/:id/actions', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const project = req.body;
-    projectDb.insert(project)
-    .then(response => {
-        res.status(200).json(response);
-    })
-    .catch(error => {
-        res.status(500).json({error: 'There was a server error'});
-    })
+    const {name , description, completed} = req.body;
+    if (!name || !description) {
+        res.status(400).json({error: 'Name and description are required'})
+    } else if (name.length > 128 || description.length > 128) {
+        res.status(400).json({error: 'Name and description must be no more that 128 characters.'});
+    } else {
+        projectDb.insert({name, description, completed})
+        .then(response => {
+            res.status(200).json(response);
+        })
+        .catch(error => {
+            res.status(500).json({error: 'There was a server error'});
+        })
+    }
 });
 
 router.put('/:id', (req, res) => {
